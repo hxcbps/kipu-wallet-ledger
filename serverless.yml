@@ -79,3 +79,9 @@ functions:
       - httpApi:
           method: POST
           path: /holds/{holdId}/release
+  listLedger:
+    handler: src/handlers/ledger.list
+    events:
+      - httpApi:
+          method: GET
+          path: /accounts/{accountId}/ledger
