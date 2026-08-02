@@ -7,11 +7,13 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc --noEmit",
+    "build": "tsc --noEmit && serverless package",
+    "dev": "serverless offline start",
     "db:migrate": "tsx scripts/migrate.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --config vitest.config.mts",
+    "test:integration": "vitest run --config vitest.integration.config.mts",
     "test:watch": "vitest --config vitest.config.mts",
     "check": "npm run lint && npm run typecheck && npm test"
   },
@@ -22,9 +24,14 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@types/aws-lambda": "8.10.162",
     "@types/node": "24.10.1",
     "@types/pg": "8.15.6",
+    "esbuild": "0.28.1",
     "eslint": "10.8.0",
+    "serverless": "3.40.0",
+    "serverless-esbuild": "1.57.2",
+    "serverless-offline": "13.10.1",
     "tsx": "4.23.1",
     "typescript": "6.0.3",
     "typescript-eslint": "8.65.0",

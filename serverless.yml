@@ -1,0 +1,56 @@
+service: kipu-wallet-ledger
+frameworkVersion: '3'
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'local'}
+  memorySize: 256
+  timeout: 10
+  httpApi:
+    payload: '2.0'
+  environment:
+    DATABASE_URL: ${env:DATABASE_URL, 'postgres://kipu:kipu@localhost:5432/kipu'}
+    DB_POOL_MAX: ${env:DB_POOL_MAX, '5'}
+    KIPU_CURRENCY: ${env:KIPU_CURRENCY, 'USD'}
+    LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
+
+plugins:
+  - serverless-esbuild
+  - serverless-offline
+
+custom:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    target: node20
+    platform: node
+    exclude:
+      - pg-native
+  serverless-offline:
+    httpPort: 3000
+    noPrependStageInUrl: true
+
+package:
+  individually: true
+  patterns:
+    - '!tests/**'
+    - '!scripts/**'
+    - '!migrations/**'
+
+functions:
+  createAccount:
+    handler: src/handlers/accounts.create
+    events:
+      - httpApi:
+          method: POST
+          path: /accounts
+  getBalance:
+    handler: src/handlers/accounts.balance
+    events:
+      - httpApi:
+          method: GET
+          path: /accounts/{accountId}/balance
