@@ -7,11 +7,12 @@ import { AppError } from '../lib/errors.js';
 
 const OPENING_BALANCES_ACCOUNT_ID = '00000000-0000-0000-0000-000000000001';
 
-type AccountRow = {
+type AccountBalanceRow = {
   id: string;
   owner_name: string;
   currency: string;
   balance_minor: string;
+  held_minor: string;
   created_at: Date;
 };
 
@@ -27,16 +28,17 @@ export type AccountRepresentation = {
   createdAt: string;
 };
 
-function representAccount(row: AccountRow): AccountRepresentation {
+function representAccount(row: AccountBalanceRow): AccountRepresentation {
   const accounting = BigInt(row.balance_minor);
+  const held = BigInt(row.held_minor);
   return {
     id: row.id,
     owner: row.owner_name,
     currency: row.currency,
     balance: {
       accounting: formatMinorAmount(accounting),
-      available: formatMinorAmount(accounting),
-      held: '0.00',
+      available: formatMinorAmount(accounting - held),
+      held: formatMinorAmount(held),
     },
     createdAt: row.created_at.toISOString(),
   };
@@ -116,10 +118,22 @@ export async function getAccountBalance(
   pool: Pool,
   accountId: string,
 ): Promise<AccountRepresentation> {
-  const result = await pool.query<AccountRow>(
-    `SELECT id, owner_name, currency, balance_minor::text, created_at
-     FROM accounts
-     WHERE id = $1 AND kind = 'customer'`,
+  const result = await pool.query<AccountBalanceRow>(
+    `SELECT
+       a.id,
+       a.owner_name,
+       a.currency,
+       a.balance_minor::text,
+       a.created_at,
+       COALESCE((
+         SELECT SUM(h.amount_minor)
+         FROM holds h
+         WHERE h.account_id = a.id
+           AND h.status = 'active'
+           AND h.expires_at > clock_timestamp()
+       ), 0)::text AS held_minor
+     FROM accounts a
+     WHERE a.id = $1 AND a.kind = 'customer'`,
     [accountId],
   );
   const account = result.rows[0];

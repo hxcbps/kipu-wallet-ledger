@@ -61,3 +61,21 @@ functions:
       - httpApi:
           method: POST
           path: /transfers
+  createHold:
+    handler: src/handlers/holds.create
+    events:
+      - httpApi:
+          method: POST
+          path: /accounts/{accountId}/holds
+  captureHold:
+    handler: src/handlers/holds.capture
+    events:
+      - httpApi:
+          method: POST
+          path: /holds/{holdId}/capture
+  releaseHold:
+    handler: src/handlers/holds.release
+    events:
+      - httpApi:
+          method: POST
+          path: /holds/{holdId}/release

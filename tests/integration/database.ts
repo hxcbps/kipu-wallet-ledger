@@ -4,6 +4,7 @@ export async function cleanDatabase(pool: Pool): Promise<void> {
   await pool.query(`
     TRUNCATE TABLE
       idempotency_keys,
+      holds,
       ledger_entries,
       ledger_transactions
     RESTART IDENTITY CASCADE

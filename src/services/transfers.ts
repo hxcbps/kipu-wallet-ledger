@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
-import type { Pool } from 'pg';
+import type { Pool, PoolClient } from 'pg';
 import { z } from 'zod';
 import { getConfig } from '../config/env.js';
 import { withTransaction } from '../db/transaction.js';
@@ -46,6 +46,18 @@ function hashTransferRequest(
   return createHash('sha256')
     .update(`v1\n${sourceAccountId}\n${destinationAccountId}\n${amountMinor}`)
     .digest('hex');
+}
+
+async function heldAmount(client: PoolClient, accountId: string): Promise<bigint> {
+  const result = await client.query<{ held_minor: string }>(
+    `SELECT COALESCE(SUM(amount_minor), 0)::text AS held_minor
+     FROM holds
+     WHERE account_id = $1
+       AND status = 'active'
+       AND expires_at > clock_timestamp()`,
+    [accountId],
+  );
+  return BigInt(result.rows[0]?.held_minor ?? '0');
 }
 
 export async function createTransfer(
@@ -145,7 +157,9 @@ export async function createTransfer(
       throw new AppError(422, 'CURRENCY_MISMATCH', 'accounts must use the system currency');
     }
 
-    if (BigInt(source.balance_minor) < amountMinor) {
+    const heldMinor = await heldAmount(client, source.id);
+    const availableMinor = BigInt(source.balance_minor) - heldMinor;
+    if (availableMinor < amountMinor) {
       throw new AppError(
         409,
         'INSUFFICIENT_FUNDS',
