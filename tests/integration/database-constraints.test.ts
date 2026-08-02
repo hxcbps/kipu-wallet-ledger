@@ -6,10 +6,6 @@ import { closePool, getPool } from '../../src/db/pool.js';
 import { createAccount } from '../../src/services/accounts.js';
 import { cleanDatabase } from './database.js';
 
-process.env.DATABASE_URL ??= 'postgres://kipu:kipu@localhost:5432/kipu_test';
-process.env.KIPU_CURRENCY = 'USD';
-process.env.LOG_LEVEL = 'error';
-
 let pool: Pool;
 
 beforeAll(async () => {

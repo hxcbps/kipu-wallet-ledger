@@ -8,10 +8,6 @@ import { listLedgerEntries } from '../../src/services/ledger.js';
 import { createTransfer } from '../../src/services/transfers.js';
 import { cleanDatabase } from './database.js';
 
-process.env.DATABASE_URL ??= 'postgres://kipu:kipu@localhost:5432/kipu_test';
-process.env.KIPU_CURRENCY = 'USD';
-process.env.LOG_LEVEL = 'error';
-
 let pool: Pool;
 
 beforeAll(async () => {

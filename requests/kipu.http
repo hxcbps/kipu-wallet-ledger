@@ -1,0 +1,57 @@
+@baseUrl = http://localhost:3000
+@accountA = replace-with-account-a-id
+@accountB = replace-with-account-b-id
+@holdId = replace-with-hold-id
+
+### Create account A
+POST {{baseUrl}}/accounts
+Content-Type: application/json
+
+{
+  "owner": "Ada Lovelace",
+  "initialBalance": "1000.00"
+}
+
+### Create account B
+POST {{baseUrl}}/accounts
+Content-Type: application/json
+
+{
+  "owner": "Grace Hopper",
+  "initialBalance": "250.00"
+}
+
+### Get accounting and available balances
+GET {{baseUrl}}/accounts/{{accountA}}/balance
+
+### Transfer; repeat this exact request to verify idempotency
+POST {{baseUrl}}/transfers
+Content-Type: application/json
+Idempotency-Key: manual-transfer-001
+
+{
+  "sourceAccountId": "{{accountA}}",
+  "destinationAccountId": "{{accountB}}",
+  "amount": "25.50"
+}
+
+### Create a hold
+POST {{baseUrl}}/accounts/{{accountA}}/holds
+Content-Type: application/json
+
+{
+  "amount": "40.00",
+  "expiresAt": "2030-01-01T00:00:00.000Z"
+}
+
+### Capture a hold
+POST {{baseUrl}}/holds/{{holdId}}/capture
+
+### Release a hold
+POST {{baseUrl}}/holds/{{holdId}}/release
+
+### First statement page
+GET {{baseUrl}}/accounts/{{accountA}}/ledger?limit=20
+
+### Next statement page; paste page.nextCursor from the prior response
+GET {{baseUrl}}/accounts/{{accountA}}/ledger?limit=20&cursor=replace-with-cursor
