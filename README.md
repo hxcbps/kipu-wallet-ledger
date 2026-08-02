@@ -31,12 +31,11 @@ flowchart LR
 
 Cada ruta de `serverless.yml` apunta a una función Lambda independiente. Los handlers adaptan HTTP; las reglas de negocio viven en servicios. Las operaciones monetarias críticas usan SQL explícito y transacciones administradas con `pg`.
 
-## Inicio rápido: desde cero en 5 comandos
+## Inicio rápido: desde cero en 4 comandos
 
 Requisitos: Node.js 20 o superior, npm y Docker con Compose v2.
 
 ```bash
-cp .env.example .env
 npm ci
 docker compose up -d --wait postgres
 npm run db:migrate
@@ -44,6 +43,8 @@ npm run dev
 ```
 
 La API queda disponible en `http://localhost:3000`. PostgreSQL escucha en `localhost:5432`. El contenedor crea `kipu` para desarrollo y `kipu_test` para integración.
+
+No necesitas crear un archivo `.env` para el entorno local: la aplicación usa por defecto la conexión de Docker documentada arriba. Si quieres personalizar puertos, credenciales u otras variables, copia `.env.example` a `.env` y ajusta sus valores.
 
 Para detener la infraestructura:
 

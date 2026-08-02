@@ -2,7 +2,10 @@ import 'dotenv/config';
 import { z } from 'zod';
 
 const envSchema = z.object({
-  DATABASE_URL: z.string().min(1),
+  DATABASE_URL: z
+    .string()
+    .min(1)
+    .default('postgres://kipu:kipu@localhost:5432/kipu'),
   DB_POOL_MAX: z.coerce.number().int().min(1).max(50).default(5),
   KIPU_CURRENCY: z.literal('USD').default('USD'),
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
