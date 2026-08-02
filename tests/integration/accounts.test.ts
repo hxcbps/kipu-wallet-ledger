@@ -3,6 +3,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { migrate } from '../../src/db/migrate.js';
 import { closePool, getPool } from '../../src/db/pool.js';
 import { createAccount, getAccountBalance } from '../../src/services/accounts.js';
+import { cleanDatabase } from './database.js';
 
 process.env.DATABASE_URL ??= 'postgres://kipu:kipu@localhost:5432/kipu_test';
 process.env.KIPU_CURRENCY = 'USD';
@@ -16,9 +17,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await pool.query('TRUNCATE ledger_entries, ledger_transactions RESTART IDENTITY CASCADE');
-  await pool.query("DELETE FROM accounts WHERE kind = 'customer'");
-  await pool.query("UPDATE accounts SET balance_minor = 0 WHERE kind = 'system'");
+  await cleanDatabase(pool);
 });
 
 afterAll(async () => {

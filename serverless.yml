@@ -54,3 +54,10 @@ functions:
       - httpApi:
           method: GET
           path: /accounts/{accountId}/balance
+  createTransfer:
+    handler: src/handlers/transfers.create
+    timeout: 15
+    events:
+      - httpApi:
+          method: POST
+          path: /transfers
