@@ -14,7 +14,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --config vitest.config.mts",
     "test:integration": "vitest run --config vitest.integration.config.mts",
+    "test:all": "npm run test && npm run test:integration",
     "test:watch": "vitest --config vitest.config.mts",
+    "stress": "tsx scripts/stress.ts",
     "check": "npm run lint && npm run typecheck && npm test"
   },
   "dependencies": {
