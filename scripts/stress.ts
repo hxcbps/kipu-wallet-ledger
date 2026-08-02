@@ -96,6 +96,12 @@ async function main(): Promise<void> {
   const rejectedAttempts = attempts.filter(
     (attempt): attempt is PromiseRejectedResult => attempt.status === 'rejected',
   );
+  const succeeded = attempts.filter((attempt) => attempt.status === 'fulfilled').length;
+  assert(succeeded > 0, 'the concurrent scenario must complete successful transfers');
+  assert(
+    rejectedAttempts.length > 0,
+    'competing transfers must exhaust funds and exercise rejection paths',
+  );
   for (const rejected of rejectedAttempts) {
     assert(rejected.reason instanceof AppError, 'unexpected technical transfer failure');
     assert.equal(
@@ -127,7 +133,6 @@ async function main(): Promise<void> {
       return { owner: result.owner, accounting: result.balance.accounting };
     }),
   );
-  const succeeded = attempts.filter((attempt) => attempt.status === 'fulfilled').length;
   process.stdout.write(`${JSON.stringify({
     event: 'stress.completed',
     runId,

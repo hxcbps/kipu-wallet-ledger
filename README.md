@@ -57,7 +57,7 @@ Para eliminar también los datos locales, usa conscientemente `docker compose do
 ## Comandos de calidad
 
 ```bash
-npm test                  # 22 pruebas unitarias; no requiere PostgreSQL
+npm test                  # 40 pruebas unitarias; no requiere PostgreSQL
 npm run test:integration  # 21 pruebas contra kipu_test
 npm run test:all          # unitarias + integración
 npm run stress            # 110 transferencias + 20 reintentos idempotentes
